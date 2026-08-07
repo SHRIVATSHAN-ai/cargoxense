@@ -6,7 +6,7 @@
 const path = require('path');
 const Database = require('better-sqlite3');
 const { shipments: seedShipments } = require('./seedData');
-const { survivalScore, riskLevel, customsReadinessPct, missingDocs, transparencyScore } = require('./riskEngine');
+const { survivalScore, riskLevel, customsReadinessPct, missingDocs, transparencyScore, freightReferenceBand, isFreightAnomaly } = require('./riskEngine');
 
 const db = new Database(path.join(__dirname, 'cargoxense.db'));
 
@@ -40,11 +40,17 @@ function buildInitialShipment(seedInput) {
     sensorReadings: readings,
     events: [...seed.events],
     insuranceEvidence: [],
+    evidenceChainValid: true, // trivially true — nothing recorded yet to tamper with
     aiRecommendation: null,
     scoreHistory: [{ timestamp: nowIso(), score: survivalScore(seed.factors) }],
   };
   shipment.customsReadiness.readinessPct = customsReadinessPct(shipment.customsReadiness);
   shipment.customsReadiness.missing = missingDocs(shipment.customsReadiness);
+  shipment.freightQuotes = shipment.freightQuotes.map((q) => ({
+    ...q,
+    expectedBand: freightReferenceBand(q.baseCost),
+    priceAnomaly: isFreightAnomaly(q.baseCost, q.currentCost),
+  }));
   return shipment;
 }
 

@@ -28,6 +28,8 @@ export interface EvidenceEntry {
   timestamp: string;
   type: string;
   description: string;
+  hash: string;
+  prevHash: string;
 }
 
 export interface FreightQuote {
@@ -38,6 +40,7 @@ export interface FreightQuote {
   currentCost: number;
   riskLevel: RiskLevel | 'LOW' | 'MODERATE' | 'HIGH';
   priceAnomaly?: boolean;
+  expectedBand: { min: number; max: number };
 }
 
 export interface CustomsReadiness {
@@ -108,6 +111,7 @@ export interface Shipment {
   sensorReadings: SensorReading[];
   events: ShipmentEvent[];
   insuranceEvidence: EvidenceEntry[];
+  evidenceChainValid: boolean;
   aiRecommendation: AIRecommendation | null;
   survivalScore: number;
   riskLevel: RiskLevel;

@@ -34,4 +34,21 @@ function transparencyScore(shipment) {
   return { overall, breakdown: { location: locationFreshness, sensor: sensorFreshness, documents: docs, custody, communication } };
 }
 
-module.exports = { survivalScore, riskLevel, customsReadinessPct, missingDocs, transparencyScore };
+// Freight price reference bands: an expected cost range derived from each
+// quote's own baseline cost, not a single flat "+20%" magic number. The band
+// is asymmetric (-10% / +15%) because spot freight rates spike far more
+// often, and further, than they dip — a quote outside its own band is what
+// gets flagged as an anomaly, not a hand-set boolean in the seed data.
+function freightReferenceBand(baseCost) {
+  return { min: Math.round(baseCost * 0.9), max: Math.round(baseCost * 1.15) };
+}
+
+function isFreightAnomaly(baseCost, currentCost) {
+  const band = freightReferenceBand(baseCost);
+  return currentCost < band.min || currentCost > band.max;
+}
+
+module.exports = {
+  survivalScore, riskLevel, customsReadinessPct, missingDocs, transparencyScore,
+  freightReferenceBand, isFreightAnomaly,
+};

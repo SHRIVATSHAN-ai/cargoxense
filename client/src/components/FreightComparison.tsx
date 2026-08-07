@@ -31,9 +31,10 @@ export function FreightComparison({ quotes }: { quotes: FreightQuote[] }) {
                   </span>
                 )}
               </div>
+              <div className="mt-0.5 font-mono-ui text-[10px] text-muted-2">Reference band: {formatINR(q.expectedBand.min)}–{formatINR(q.expectedBand.max)}</div>
               {q.priceAnomaly && (
                 <div className="mt-2">
-                  <Callout tone="critical" label="Alert">Abnormal freight price, limited alternatives, requires review</Callout>
+                  <Callout tone="critical" label="Alert">Current cost falls outside the expected reference band — limited alternatives, requires review.</Callout>
                 </div>
               )}
             </div>

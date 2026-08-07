@@ -3,14 +3,15 @@
 // gentle background sensor jitter so the dashboard feels alive at rest.
 
 const { nowIso } = require('./db');
-const { survivalScore, riskLevel, transparencyScore } = require('./riskEngine');
+const { survivalScore, riskLevel, transparencyScore, isFreightAnomaly } = require('./riskEngine');
+const { appendEvidence } = require('./evidence');
 
 function addEvent(shipment, type, title, description, severity) {
   shipment.events.unshift({ timestamp: nowIso(), type, title, description, severity });
 }
 
 function pushEvidence(shipment, type, description) {
-  shipment.insuranceEvidence.push({ timestamp: nowIso(), type, description });
+  appendEvidence(shipment, type, description);
 }
 
 function recompute(shipment) {
@@ -31,9 +32,11 @@ const STAGES = [
   },
   function portCongestion(shipment) {
     shipment.factors.delay = Math.max(0, shipment.factors.delay - 15);
-    shipment.freightQuotes = shipment.freightQuotes.map((q, i) =>
-      i === 0 ? { ...q, currentCost: Math.round(q.baseCost * 2.07), priceAnomaly: true } : q
-    );
+    shipment.freightQuotes = shipment.freightQuotes.map((q, i) => {
+      if (i !== 0) return q;
+      const currentCost = Math.round(q.baseCost * 2.07);
+      return { ...q, currentCost, priceAnomaly: isFreightAnomaly(q.baseCost, currentCost) };
+    });
     addEvent(shipment, 'DISRUPTION', 'Port congestion at transit hub',
       'Vessel queue times have tripled at the transit port. Emergency freight quotations are rising sharply for this lane.', 'WARNING');
   },

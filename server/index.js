@@ -8,6 +8,7 @@ const { Server } = require('socket.io');
 const db = require('./db');
 const simulation = require('./simulation');
 const copilot = require('./copilot');
+const evidence = require('./evidence');
 
 const app = express();
 
@@ -100,6 +101,7 @@ app.get('/api/shipments/:id/evidence', (req, res) => {
     shipmentId: shipment.id,
     incident: shipment.incident,
     evidence: shipment.insuranceEvidence,
+    chainValid: evidence.verifyChain(shipment),
     events: shipment.events,
     claimStatus: shipment.claimStatus || 'NO CLAIM',
     economicImpact: shipment.economicImpact || null,

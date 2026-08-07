@@ -181,7 +181,7 @@ const shipments = [
       available: ['Commercial Invoice', 'Packing List', 'Certificate of Origin', 'Bill of Lading'],
     },
     freightQuotes: [
-      { carrier: 'Apex Freight Solutions', route: 'Direct', transitDays: 26, baseCost: 340000, currentCost: 705000, riskLevel: 'HIGH', priceAnomaly: true },
+      { carrier: 'Apex Freight Solutions', route: 'Direct', transitDays: 26, baseCost: 340000, currentCost: 705000, riskLevel: 'HIGH' },
       { carrier: 'Northline Cargo', route: 'Via Long Beach', transitDays: 29, baseCost: 355000, currentCost: 380000, riskLevel: 'MODERATE' },
       { carrier: 'Everline Shipping', route: 'Via Vancouver', transitDays: 31, baseCost: 330000, currentCost: 350000, riskLevel: 'LOW' },
     ],

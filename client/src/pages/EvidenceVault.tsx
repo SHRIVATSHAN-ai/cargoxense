@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { DownloadSimple, FileText } from '@phosphor-icons/react';
+import { DownloadSimple, FileText, ShieldCheck, ShieldWarning } from '@phosphor-icons/react';
 import { useShipmentsStore } from '../store/useShipments';
 import { formatINR, formatDateTime } from '../lib/format';
 import { downloadJson } from '../lib/download';
@@ -82,6 +82,7 @@ export function EvidenceVault() {
                 <button
                   onClick={() => downloadJson(`${selected.id}-incident-report.json`, {
                     shipment: selected.id, incident: selected.incident, evidence: selected.insuranceEvidence,
+                    evidenceChainValid: selected.evidenceChainValid,
                     events: selected.events, economicImpact: selected.economicImpact ?? null, claimStatus: selected.claimStatus ?? 'NO CLAIM',
                   })}
                   className="mt-5 flex items-center gap-1.5 rounded-sm border border-border px-3 py-2 font-mono-ui text-xs uppercase tracking-[0.06em] transition hover:border-brand/50 hover:text-brand"
@@ -92,7 +93,23 @@ export function EvidenceVault() {
               </Panel>
 
               <Panel>
-                <Eyebrow>Evidence Chain</Eyebrow>
+                <div className="flex items-center justify-between">
+                  <Eyebrow>Evidence Chain</Eyebrow>
+                  {selected.insuranceEvidence.length > 0 && (
+                    selected.evidenceChainValid ? (
+                      <span className="flex items-center gap-1.5 font-mono-ui text-[10px] uppercase tracking-[0.06em] text-good">
+                        <ShieldCheck size={13} weight="regular" />
+                        Chain verified
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1.5 font-mono-ui text-[10px] uppercase tracking-[0.06em] text-critical">
+                        <ShieldWarning size={13} weight="regular" />
+                        Chain broken
+                      </span>
+                    )
+                  )}
+                </div>
+                <p className="mt-2 text-xs text-muted">Each entry's hash covers its own content plus the previous entry's hash — editing any past entry would break every hash after it.</p>
                 <ol className="mt-4 space-y-3">
                   {selected.insuranceEvidence.map((e, i) => (
                     <li key={i} className="flex items-start gap-3 border-b border-border-soft pb-3 last:border-0 last:pb-0">
@@ -103,6 +120,7 @@ export function EvidenceVault() {
                       <div>
                         <div className="text-sm text-text">{e.description}</div>
                         <div className="font-mono-ui text-[10px] text-muted-2">{formatDateTime(e.timestamp)}</div>
+                        <div className="mt-0.5 font-mono-ui text-[9px] text-muted-2" title={`hash ${e.hash}\nprev ${e.prevHash}`}>#{e.hash.slice(0, 10)}</div>
                       </div>
                     </li>
                   ))}
