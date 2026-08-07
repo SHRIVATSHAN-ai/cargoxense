@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: cargoxense
+    runtime: node
+    plan: free
+    buildCommand: npm install --prefix server && npm install --prefix client && npm run build --prefix client
+    startCommand: npm start --prefix server
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: ACCESS_USER
+        sync: false
+      - key: ACCESS_PASS
+        sync: false
